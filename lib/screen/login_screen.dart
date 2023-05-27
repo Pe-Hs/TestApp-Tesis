@@ -1,90 +1,156 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:login/providers/login_form_provider.dart';
+import 'package:login/ui/input_decoration.dart';
+import 'package:login/widgets/auth_back.dart';
+import 'package:login/widgets/card_container.dart';
+import 'package:provider/provider.dart';
 
-import 'package:login/screen/home.dart';
+import '../services/auth_service.dart';
+import '../services/notification_service.dart';
 
-// ignore: use_key_in_widget_constructors
 class LoginPage extends StatelessWidget {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  
+  const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Login'),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(labelText: 'E-mail'),
-            ),
-            TextField(
-              controller: _passwordController,
-              obscureText: true,
-              decoration: InputDecoration(labelText: 'Contraseña'),
-            ),
-            SizedBox(
-              height: 32,
-            ),
-            ElevatedButton(
-              onPressed: () {
-                _login(context);
-              },
-              child: Text('Inciar Sesion'),
-            )
-          ],
+      body: AuthBack(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              SizedBox(
+                height: 250,
+              ),
+              CardContainer(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      'Inciar Sesion',
+                      style: Theme.of(context).textTheme.headline4,
+                    ),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    ChangeNotifierProvider(
+                      create: (_) => LoginFormProvider(),
+                      child: _LoginForm(),
+                    )
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 50,
+              ),
+              TextButton(
+                onPressed: () {},
+                child: Text(
+                  'Crear Cuenta',
+                  style: TextStyle(fontSize: 18, color: Colors.black87),
+                ),
+              ),
+              SizedBox(
+                height: 50,
+              )
+            ],
+          ),
         ),
       ),
     );
   }
 
-  void _login(BuildContext context) async {
-    final email = _emailController.text;
-    final password = _passwordController.text;
+}
 
-    var url = Uri.http('192.168.1.3:4000', 'api/auth/');
+class _LoginForm extends StatelessWidget {
+  
+  @override
+  Widget build(BuildContext context) {
+    final loginForm = Provider.of<LoginFormProvider>(context);
 
-    final response =
-        await http.post(
-            url,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'email': email,
-              'password': password,
-            })
-        );
+    return Container(
+      child: Form(
+        key: loginForm.formkey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        child: Column(
+          children: [
+            TextFormField(
+              autocorrect: false,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecorations.authInputDecoration(
+                  hintText: 'asd@gmail.com',
+                  labelText: 'Email',
+                  prefixIcon: Icons.alternate_email_rounded),
+              onChanged: (value) => loginForm.email = value,
+              validator: (value) {
+                String pattern =
+                    r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+                RegExp regExp = RegExp(pattern);
 
-    if (response.statusCode == 200) {
-      // final token = json.decode(response.body)['token'];
-      // final storage = FlutterSecureStorage();
-      // await storage.write(key: 'token', value: token);
-      // ignore: use_build_context_synchronously
-      Navigator.pushNamed(context, 'home');
-      
-    } else {
-     
-      showDialog(
-          context: context,
-          builder: ((context) => AlertDialog(
-                title: Text('Error'),
-                content: Text('Email o Contraseña Incorrecta'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text('OK'),
-                  )
-                ],
-              )));
-    }
+                return regExp.hasMatch(value ?? '')
+                    ? null
+                    : 'Ingrese formato correto de Email';
+              },
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            TextFormField(
+              autocorrect: false,
+              obscureText: true,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecorations.authInputDecoration(
+                  hintText: '*****',
+                  labelText: 'Contraseña',
+                  prefixIcon: Icons.lock_outline),
+              onChanged: (value) => loginForm.password = value,
+              validator: (value) {
+                return (value != null && value.length >= 6)
+                    ? null
+                    : 'La contraseña debe de ser de 6 caracteres';
+              },
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            MaterialButton(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                disabledColor: Colors.grey,
+                elevation: 0,
+                color: Color.fromRGBO(207, 166, 90, 1),
+                child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 80, vertical: 15),
+                    child: Text(
+                      loginForm.isLoading ? 'Espere' : 'Ingresar',
+                      style: TextStyle(color: Colors.black, fontSize: 18),
+                    )),
+                onPressed: loginForm.isLoading
+                    ? null
+                    : () async {
+                        FocusScope.of(context).unfocus();
+                        final authService =
+                            Provider.of<AuthService>(context, listen: false);
+
+                        if (!loginForm.isValidForm()) return;
+
+                        loginForm.isLoading = true;
+
+                        final String? errorMessage = await authService.login(
+                            loginForm.email, loginForm.password);
+
+                        if (errorMessage == null) {
+                          Navigator.pushReplacementNamed(context, 'home');
+                        } else {
+                          NotificationsService.showSnackbar(errorMessage);
+                          loginForm.isLoading = false;
+                        }
+                      })
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -34,14 +34,38 @@ class AppSearch extends SearchDelegate {
 
   Widget _emptyContainer(){
     return Container(
-      
+      child: Center(
+        child: Icon(
+          Icons.bug_report,
+          color: Colors.amber,
+          size: 130,
+        ),
+      ),
     );
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    // TODO: implement buildSuggestions
-    throw UnimplementedError();
+   if(query.isEmpty){
+    return Container(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.bug_report,
+              color: Colors.black38,
+              size: 130,
+            ),
+            Text('No hay Resultados por Mostrar')
+          ],
+        ),
+      ),
+    );
+   }
+
+    return _emptyContainer();
+
   }
 
 }

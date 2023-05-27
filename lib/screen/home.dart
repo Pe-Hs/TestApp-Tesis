@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:login/widgets/search-bar.dart';
 
 import '../widgets/categorias-widget.dart';
 
@@ -7,13 +8,13 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-
-      ),
-      child: ListView(
+    return Scaffold(
+      backgroundColor: Colors.amber,      
+      body: ListView(
         children: [
+          SearchBar(),
           CategoriaWidget(),
+          
         ],
       ),
     );

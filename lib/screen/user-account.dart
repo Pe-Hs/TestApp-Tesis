@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:login/screen/login_screen.dart';
 
+import 'package:flutter/material.dart';
 
 class UserAccount extends StatelessWidget {
   const UserAccount({super.key});
@@ -31,6 +30,6 @@ class UserAccount extends StatelessWidget {
     // final storage = FlutterSecureStorage();
     // await storage.delete(key: 'token');
 
-     Navigator.pushNamed(context, 'login');
+     Navigator.pushReplacementNamed(context, 'login');
   }
 }
