@@ -1,51 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:login/search/searh_delegate.dart';
+import 'package:ionicons/ionicons.dart';
 
-class SearchBar extends StatelessWidget {
+class SearchBar extends StatefulWidget {
   const SearchBar({super.key});
 
   @override
+  State<SearchBar> createState() => _SearchBarState();
+}
+
+class _SearchBarState extends State<SearchBar> {
+  @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-      height: 70,
+      margin: EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(20)),
+        color: Colors.black.withOpacity(0.05)
+      ),
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20),
+          SizedBox(width: 10,),
+          Icon(Ionicons.search_outline),
+          Expanded(
             child: Container(
-              height: 50,
-              color: Colors.amberAccent,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  SizedBox(
-                    width: 20,
-                  ),
-                  Icon(
-                    Icons.search,
-                    color: Color.fromRGBO(126, 130, 153, 1),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      showSearch(context: context, delegate: AppSearch());
-                    },
-                    child: Container(
-                      width: 250,
-                      color: Colors.white,
-                    ),
-                  ),
-                  IconButton(
-                      onPressed: () {},
-                      icon: Icon(Icons.mic),
-                      color: Color.fromRGBO(126, 130, 153, 1)),
-                  SizedBox(
-                    width: 5,
-                  )
-                ],
+              padding: EdgeInsets.only(left: 16),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Buscar',
+                  border: InputBorder.none
+                ),
               ),
             ),
-          ),                  
+          ),
+          SizedBox(width: 10,),
+          Icon(Ionicons.mic_outline, color: Colors.amber,),
+          SizedBox(width: 10,),
         ],
       ),
     );

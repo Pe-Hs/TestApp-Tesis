@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:login/providers/login_form_provider.dart';
+import 'package:login/services/carrito_service.dart';
 import 'package:login/ui/input_decoration.dart';
 import 'package:login/widgets/auth_back.dart';
 import 'package:login/widgets/card_container.dart';
@@ -9,7 +11,6 @@ import '../services/auth_service.dart';
 import '../services/notification_service.dart';
 
 class LoginPage extends StatelessWidget {
-  
   const LoginPage({super.key});
 
   @override
@@ -46,7 +47,11 @@ class LoginPage extends StatelessWidget {
                 height: 50,
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () => Navigator.pushReplacementNamed(context, 'register'),
+                style: ButtonStyle(
+                  overlayColor: MaterialStateProperty.all( Colors.indigo.withOpacity(0.1)),
+                  shape: MaterialStateProperty.all( StadiumBorder() )
+                ),
                 child: Text(
                   'Crear Cuenta',
                   style: TextStyle(fontSize: 18, color: Colors.black87),
@@ -61,11 +66,9 @@ class LoginPage extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class _LoginForm extends StatelessWidget {
-  
   @override
   Widget build(BuildContext context) {
     final loginForm = Provider.of<LoginFormProvider>(context);
@@ -118,7 +121,7 @@ class _LoginForm extends StatelessWidget {
             MaterialButton(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
-                disabledColor: Colors.grey,
+                disabledColor: Color.fromARGB(255, 255, 222, 173),
                 elevation: 0,
                 color: Color.fromRGBO(207, 166, 90, 1),
                 child: Container(
@@ -127,12 +130,17 @@ class _LoginForm extends StatelessWidget {
                       loginForm.isLoading ? 'Espere' : 'Ingresar',
                       style: TextStyle(color: Colors.black, fontSize: 18),
                     )),
-                onPressed: loginForm.isLoading
-                    ? null
-                    : () async {
+                onPressed: loginForm.isLoading ? null : () async {
                         FocusScope.of(context).unfocus();
+
                         final authService =
                             Provider.of<AuthService>(context, listen: false);
+                        final carritoService =
+                            Provider.of<CarritoService>(context, listen: false);
+                            
+                        final storage = FlutterSecureStorage();
+
+                        var idUsuario = await storage.read(key: 'idUsuario');
 
                         if (!loginForm.isValidForm()) return;
 
@@ -141,9 +149,14 @@ class _LoginForm extends StatelessWidget {
                         final String? errorMessage = await authService.login(
                             loginForm.email, loginForm.password);
 
+                        final String? carritoCreado = await carritoService.crearCarrito(idUsuario);
+
                         if (errorMessage == null) {
+                          print(carritoCreado);
                           Navigator.pushReplacementNamed(context, 'home');
                         } else {
+                          //SnackBar(content: Text( errorMessage , style: TextStyle( color: Colors.white, fontSize: 20) ));
+                          print(errorMessage);
                           NotificationsService.showSnackbar(errorMessage);
                           loginForm.isLoading = false;
                         }

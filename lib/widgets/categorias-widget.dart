@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'package:login/screen/login_screen.dart';
+import 'package:ionicons/ionicons.dart';
 
 class CategoriaWidget extends StatelessWidget {
   const CategoriaWidget({super.key});
@@ -9,71 +10,81 @@ class CategoriaWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     // ignore: avoid_unnecessary_containers
     return Container(
-      padding: EdgeInsets.only(top: 30, right: 10, left: 10),
-      height: 200,         
+      padding: EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Categorias',
-          style: TextStyle(
-            fontSize: 25,
-            fontWeight: FontWeight.bold
-          )),
-          SizedBox( height: 10,),
-          Expanded(
-            child: ListView.separated(
-              separatorBuilder: (context, index) => SizedBox( width: 15,),
-              scrollDirection: Axis.horizontal,
-              itemCount: 6,
-              itemBuilder: (context, index) {
-                return _CategoriaSlider(index);
-              },
+          Text(
+            'Categorias',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20
             ),
+            ),
+          SizedBox(height: 10,),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _FilterIcon(Icon(Ionicons.color_fill_outline, size: 50,), 'Aderezo', Color.fromARGB(235, 209, 91, 91)),
+              _FilterIcon(Icon(Ionicons.leaf_outline, size: 50,), 'Especias', Colors.lightGreen),
+              _FilterIcon(Icon(Ionicons.fast_food_outline, size: 50,), 'Otros', Colors.amber)
+            ],
           )
         ],
-      )
+      ),
     );
   }
 
-  void _logout(BuildContext context) async {
-    // final storage = FlutterSecureStorage();
-    // await storage.delete(key: 'token');
-
-     Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => LoginPage()));
-  }
 }
 
-class _CategoriaSlider extends StatelessWidget {
-  
-  final int nro;
+class _FilterIcon extends StatelessWidget {
 
-  const _CategoriaSlider(this.nro);
+  final Icon icon;
+  final String filtername;
+  final Color color;
+
+
+  const _FilterIcon(this.icon, this.filtername, this.color);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 75,
-      height: 90,
-      child: Column(
-        children: [
-          GestureDetector(
-            onTap: () {},
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: FadeInImage(
-                placeholder: AssetImage('assets/no_image.jpg'),
-                image: NetworkImage('https://picsum.photos/seed/${(nro*8)-8}/200/300'),
-                height: 70,
-                width: 80,
-                fit: BoxFit.cover,
-              ),
-            ),
+
+    final storage  = FlutterSecureStorage();
+
+
+    return Column(
+      children: [
+        Container(
+          padding: EdgeInsets.all(2),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: color,
+            boxShadow: [
+              BoxShadow(
+                offset: Offset(0,3),
+                blurRadius: 2,
+                spreadRadius: 1,
+                color: Colors.black.withOpacity(0.2)
+              )
+            ]
           ),
-          SizedBox(height: 5,),
-          Text('Categ.0$nro')
-        ],
-      ),
+          child: IconButton(
+            iconSize: 60,
+            color: Colors.white,
+            icon: icon,
+            onPressed: () {
+              Navigator.pushNamed(context, filtername);
+            },
+          ),
+        ),
+        SizedBox(height: 10,),
+        Text(
+          filtername,
+          style: TextStyle(
+            fontSize: 16,
+          ),
+        )
+      ],
     );
   }
 }

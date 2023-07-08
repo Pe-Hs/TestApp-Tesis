@@ -1,5 +1,8 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:ionicons/ionicons.dart';
+
 import 'package:flutter/material.dart';
+
 import 'package:login/screen/home.dart';
 import 'package:login/screen/user-account.dart';
 import 'package:login/screen/productos_screen.dart';
@@ -16,7 +19,6 @@ class _NavigatorBarState extends State<NavigatorBar> {
 
   @override
   Widget build(BuildContext context) {
-
     final List<Widget> _tabItems = [
       ProductosList(),
       MainScreen(),
@@ -29,22 +31,24 @@ class _NavigatorBarState extends State<NavigatorBar> {
         height: 50,
         index: 1,
         backgroundColor: Colors.white,
+        buttonBackgroundColor: Colors.lightGreen,
+        animationCurve: Curves.easeInOutQuint,
         color: Colors.amber,
         items: [
           Icon(
-            Icons.shopping_cart,
+            Ionicons.cart_outline,
             size: 30,
-            color: Colors.black,
+            color: Colors.white,
           ),
           Icon(
-            Icons.home,
+            Ionicons.home_outline,
             size: 30,
-            color: Colors.black,
+            color: Colors.white,
           ),
           Icon(
-            Icons.account_circle_sharp,
+            Ionicons.person_outline,
             size: 30,
-            color: Colors.black,
+            color: Colors.white,
           )
         ],
         onTap: (index) {
